@@ -8,15 +8,17 @@ module.exports = (sequelize, DataTypes) => {
         },
         AIAssigned: {
             type: DataTypes.BOOLEAN //1 for AI, 0 for user
+        },
+        value: {
+            type: DataTypes.INTEGER //-1 for inaccurate, 0 for NA, 1 for accurate
+        },
+        reason: {
+            type: DataTypes.TEXT('long')
         }
        
     }, {
         charset: 'utf8mb4',
     });
-
-    AccuracyLabel.associate = function (models) {
-        models.AccuracyLabel.belongsTo(models.Tweet);
-    };
 
     return AccuracyLabel;
   };

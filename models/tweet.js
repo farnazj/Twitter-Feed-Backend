@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
         text: {
             type: DataTypes.TEXT('long')
         },
+        preTask: { //part of the set of tweets that users assess as the pre-task
+            type: DataTypes.BOOLEAN
+        },
         retweetCount: {
             type: DataTypes.INTEGER
         },
@@ -24,9 +27,8 @@ module.exports = (sequelize, DataTypes) => {
   
     Tweet.associate = function (models) {
         models.Tweet.hasOne(models.TweetSource);
-        models.Tweet.hasMany(models.AccuracyLabel, {as: 'TweetAccuracyLabels' });
+        models.Tweet.hasMany(models.AccuracyLabel, { as: 'TweetAccuracyLabels' });
     };
- 
 
     return Tweet;
   };
