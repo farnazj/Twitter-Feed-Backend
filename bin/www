@@ -7,6 +7,13 @@
 var app = require('../app');
 var debug = require('debug')('twitter-feed:server');
 var http = require('http');
+const db = require('../models');
+const WebSocketServer = require('ws').Server;
+const sessConfig = require('../lib/sessionConfig').sessConfig;
+var url = require('url');
+let userIdSocketMapping = {}
+const logger = require('../lib/logger');
+require('../lib/queueProcessor').processRealTimeQueue(userIdSocketMapping);
 
 /**
  * Get port from environment and store in Express.
@@ -21,13 +28,97 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+
+var wss = new WebSocketServer({
+  server: server,
+  path: '/realtime',
+  verifyClient: (info, done) => {
+    sessConfig(info.req, {}, () => {
+      done(info.req.session)
+    })
+  }
+});
+
+
+wss.on('connection', async function connection(ws, req) {
+
+  logger.silly('incoming connection ' + JSON.stringify(ws))
+  try {
+    if (!req.session.passport || !req.session.passport.user)
+      throw { type: 'unauthorized', message: 'User is not logged in' };
+
+      const parameters = url.parse(req.url, true);
+
+      let user = await db.User.findOne({
+        where: {
+          email: parameters.query.email
+        }
+      });
+
+      if (!user)
+        throw { type: 'unauthorized', message: 'Something is wrong' };
+
+      ws.isAlive = true;
+      ws.on('pong', heartbeat);
+
+      ws.userId = user.id;
+      userIdSocketMapping[ws.userId] = ws;
+
+      ws.on('message', async (message) => {
+        let messageParsed = JSON.parse(message);
+      });
+
+      ws.on('error', (message) => {
+        logger.error(`error in websocket connections ${message}`);
+      });
+
+      ws.on('close', function close() {
+        if (ws.userId in userIdSocketMapping)
+          delete userIdSocketMapping[ws.userId];
+      });
+  }
+  catch(e) {
+    ws.send(JSON.stringify({ type: e.type, message: e.message }));
+    ws.close();
+  }
+
+})
+
+
+const interval = setInterval(function ping() {
+
+wss.clients.forEach(function each(ws) {
+  if (ws.isAlive === false) {
+    if (ws.userId in userIdSocketMapping)
+      delete userIdSocketMapping[ws.userId];
+
+    return ws.terminate();
+  }
+
+  ws.isAlive = false;
+  ws.ping(noop);
+});
+}, 30000);
+
+wss.on('close', function close() {
+clearInterval(interval);
+});
+
+function noop() {}
+
+function heartbeat() {
+this.isAlive = true;
+}
+
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+db.sequelize.sync().then(async function() {
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+})
 
 /**
  * Normalize a port into a number, string, or false.

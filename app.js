@@ -18,6 +18,7 @@ const { v4: uuidv4 } = require('uuid');
 var rfs = require('rotating-file-stream');
 require('dotenv').config({ path: path.join(__dirname,'/../.env') }); //for loading environment variables into process.env
 var redisClient = require('./lib/redisConfigs');
+var sessConfig = require('./lib/sessionConfig').sessConfig;
 
 
 const { AssertionError } = require('assert');
@@ -113,29 +114,12 @@ app.use(express.urlencoded({ extended: true, limit: '750kb'}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(compression()); //Compress all routes
 
-var sess = {
-  genid: function(req) {
-   return uuidv4() // use UUIDs for session IDs
-  },
-  secret: process.env.SESSION_KEY,
-  name: process.env.COOKIE_NAME,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    httpOnly: false,
-    secure: false,
-    maxAge: 4 * 24 * 60 * 60 * 1000
-  },
-  rolling: true,
-  store: new redisStore({ host: 'localhost', port: 6379, client: redisClient}),
-};
-
 if (app.get('env') === 'production') {
   //app.set('trust proxy', 1)
   //sess.cookie.secure = true 
 }
 
-app.use(session(sess));
+app.use(sessConfig);
 
 
 app.use(passport.initialize())
