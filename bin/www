@@ -13,7 +13,7 @@ const sessConfig = require('../lib/sessionConfig').sessConfig;
 var url = require('url');
 let userIdSocketMapping = {}
 const logger = require('../lib/logger');
-require('../lib/queueProcessor').processRealTimeQueue(userIdSocketMapping);
+require('../lib/predictionsQueueProcessor').processRealTimeQueue(userIdSocketMapping);
 
 /**
  * Get port from environment and store in Express.
