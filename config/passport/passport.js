@@ -39,7 +39,7 @@ module.exports = function(passport) {
                         })
                     }
 
-            )}
+                )}
 
             })
             .catch(function(reason) {

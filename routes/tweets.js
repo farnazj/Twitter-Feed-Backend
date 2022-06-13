@@ -11,7 +11,7 @@ var routeHelpers = require('../lib/routeHelpers');
 
 
 router.route('/tweets')
-.get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res){
+.get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
     
     let tweets;
     if (typeof req.headers.pre !== 'undefined') { //for fetching the subset of tweets that the user needs to assess in the pre-task

@@ -14,6 +14,7 @@ var url = require('url');
 let userIdSocketMapping = {}
 const logger = require('../lib/logger');
 require('../lib/predictionsQueueProcessor').processRealTimeQueue(userIdSocketMapping);
+var registerTweets = require('../registerTweets');
 
 /**
  * Get port from environment and store in Express.
@@ -115,6 +116,8 @@ this.isAlive = true;
  */
 
 db.sequelize.sync().then(async function() {
+  await registerTweets();
+
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListening);

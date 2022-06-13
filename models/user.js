@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
       isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
+      },
+      completedPreTask: {
+          tyep: DataTypes.BOOLEAN,
+          defaultValue: false
       }
     });
   

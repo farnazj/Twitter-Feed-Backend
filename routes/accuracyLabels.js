@@ -91,7 +91,9 @@ router.route('/accuracy-label/:tweet_id')
     let [user, tweet] = await Promise.all([userProm, tweetProm]);
 
     let associationProms = [user.addUserAccuracyLabels(newTweetLabel), tweet.addTweetAccuracyLabels(newTweetLabel)];
+    util.submitTrainingData(req.user.id);
 
+    res.send({ message: 'updated', data: newTweetLabel });
 
 }))
 

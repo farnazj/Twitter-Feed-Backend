@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         retweetCount: {
             type: DataTypes.INTEGER
         },
-        like_count: {
+        likeCount: {
             type: DataTypes.INTEGER
         }
         // no reply or quote count because we can't show them 
@@ -31,4 +31,4 @@ module.exports = (sequelize, DataTypes) => {
     };
 
     return Tweet;
-  };
+  }
