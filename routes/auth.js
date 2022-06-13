@@ -63,3 +63,5 @@ router.route('/signup')
 
  })(req, res, next);
 });
+
+module.exports = router;

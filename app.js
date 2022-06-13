@@ -2,7 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+var morgan = require('morgan');
 const logger = require('./lib/logger');
 var bodyParser = require('body-parser');
 var fs = require('fs');
@@ -131,7 +131,7 @@ fs.readdirSync(routesPath).forEach(function(file){
  app.use('/', require(routesPath + '/' + file));
 });
 
-require('./config/passport/passport.js/passport.js.js.js')(passport);
+require('./config/passport/passport.js')(passport);
 
 
 // catch 404 and forward to error handler
