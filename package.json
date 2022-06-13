@@ -26,8 +26,10 @@
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "redis": "^4.1.0",
+    "rotating-file-stream": "^3.0.4",
     "sequelize": "^6.20.1",
     "winston": "^3.7.2",
-    "winston-daily-rotate-file": "^4.7.1"
+    "winston-daily-rotate-file": "^4.7.1",
+    "ws": "^8.8.0"
   }
 }
