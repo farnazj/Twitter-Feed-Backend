@@ -20,24 +20,27 @@ module.exports = async function() {
                 defaults: {
                     postTime: el.created_at,
                     text: el.text,
-                    preTask: index,
+                    preTask: !index,
                     retweetCount: el.retweet_count,
                     likeCount: el.like_count
                 }
             })
-            .then(([tweet, _]) => {
-                db.TweetSource.findOrCreate({
-                    where: {
-                        username: el.username
-                    },
-                    defaults: {
-                        name: el.name,
-                        imageUrl: el.profile_image_url
-                    }
-                })
-                .then(([tweetSource, _]) => {
-                    tweet.setTweetSource(tweetSource);
-                })
+            .then(([tweet, created]) => {
+                if (created) {
+                    db.TweetSource.findOrCreate({
+                        where: {
+                            username: el.username
+                        },
+                        defaults: {
+                            name: el.name,
+                            imageUrl: el.profile_image_url
+                        }
+                    })
+                    .then(([tweetSource, _]) => {
+                        tweet.setTweetSource(tweetSource);
+                    })
+                }
+                
             })
         })
 

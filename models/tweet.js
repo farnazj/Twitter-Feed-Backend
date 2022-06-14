@@ -3,7 +3,7 @@
 module.exports = (sequelize, DataTypes) => {
     const Tweet = sequelize.define('Tweet', {
         tweetId: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING
         },
         postTime: {
             type: DataTypes.DATE

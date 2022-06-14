@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: true
       },
       completedPreTask: {
-          tyep: DataTypes.BOOLEAN,
+          type: DataTypes.BOOLEAN,
           defaultValue: false
       }
     });

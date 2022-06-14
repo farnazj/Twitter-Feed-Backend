@@ -38,8 +38,11 @@ router.route('/logout')
 
 .post( function(req, res) {
 
-  req.logout();
-  res.sendStatus(200);
+  req.logout(function(err) {
+    if (err) { return next(err); }
+      res.sendStatus(200);
+    });
+  
 });
 
 
@@ -47,6 +50,7 @@ router.route('/signup')
 
 .post(function(req, res, next) {
 
+  console.log(req.body, 'req')
   passport.authenticate('local-signup', function(err, user, info) {
 
     if (err) {

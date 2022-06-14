@@ -17,10 +17,13 @@ router.route('/tweets')
     if (typeof req.headers.pre !== 'undefined') { //for fetching the subset of tweets that the user needs to assess in the pre-task
         tweets = await db.Tweet.findAll({
             where: {
-                pre: {
+                preTask: {
                     [Op.eq]: true
                 }
-            }
+            },
+            include:[{
+                model: db.TweetSource,
+            }]
         });
     }
     else {
@@ -36,6 +39,8 @@ router.route('/tweets')
                     },
                     version: 1
                 }
+            }, {
+                model: db.TweetSource
             }],
             ...paginationReq
         });
