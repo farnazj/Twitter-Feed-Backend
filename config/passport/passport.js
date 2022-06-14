@@ -13,15 +13,12 @@ module.exports = function(passport) {
       },
 
         function(req, username, password, done) {
-          console.log('req', username, password)
 
             User.findOne({
               where: {
                 email: username
               }
             }).then(function(user) {
-
-              console.log('peida shod', user)
 
                 if (user)
                 {
@@ -62,8 +59,6 @@ module.exports = function(passport) {
 
     passport.deserializeUser(function(id, done) {
       User.findByPk(id).then(function(user) {
-
-        console.log('did it work', user)
 
         if (user) {
           done(null, user.get());

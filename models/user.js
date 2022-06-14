@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
 
     User.associate = function (models) {
         models.User.hasMany(models.AccuracyLabel, { as: 'UserAccuracyLabels' });
+        models.User.hasOne(models.ModelConfig);
     };
 
 

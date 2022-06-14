@@ -12,7 +12,8 @@ var routeHelpers = require('../lib/routeHelpers');
 
 router.route('/tweets')
 .get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
-    
+    let paginationReq = routeHelpers.getLimitOffset(req);
+
     let tweets;
     if (typeof req.headers.pre !== 'undefined') { //for fetching the subset of tweets that the user needs to assess in the pre-task
         tweets = await db.Tweet.findAll({
@@ -23,11 +24,11 @@ router.route('/tweets')
             },
             include:[{
                 model: db.TweetSource,
-            }]
+            }],
+            ...paginationReq
         });
     }
     else {
-        let paginationReq = routeHelpers.getLimitOffset(req);
 
         tweets = await db.Tweet.findAll({
             include: [{

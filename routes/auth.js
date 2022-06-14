@@ -9,7 +9,7 @@ const Op = Sequelize.Op;
 var crypto = require('crypto');
 var path = require('path');
 require('dotenv').config({ path: path.join(__dirname,'/../.env') })
-
+var util = require('../lib/util');
 
 router.route('/login')
 
@@ -48,9 +48,8 @@ router.route('/logout')
 
 router.route('/signup')
 
-.post(function(req, res, next) {
+.post( function(req, res, next)  {
 
-  console.log(req.body, 'req')
   passport.authenticate('local-signup', function(err, user, info) {
 
     if (err) {
@@ -58,8 +57,16 @@ router.route('/signup')
     }
 
     if (user) {
+      db.ModelConfig.create({
+        workspace: user.email + '-' + util.makeRandomId(7)
+      })
+      .then((modelConfig) => {
+        user.setModelConfig(modelConfig)
+        .then(() => {
+          res.status(200).send({ message: `Thanks for signing up! Your account is all set.` })
+        })
+      })
 
-      res.status(200).send({ message: `Thanks for signing up! Your account is all set.` })
     }
     else {
       res.status(400).send({ message: info.message });
