@@ -35,6 +35,5 @@ module.exports = (sequelize, DataTypes) => {
         models.User.hasOne(models.ModelConfig);
     };
 
-
     return User;
   };

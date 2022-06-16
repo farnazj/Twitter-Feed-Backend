@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
         tweetId: {
             type: DataTypes.STRING
         },
+        elementId: {
+            type: DataTypes.STRING //element id defined by the sleuth backend
+        },
         postTime: {
             type: DataTypes.DATE
         },
@@ -19,6 +22,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         likeCount: {
             type: DataTypes.INTEGER
+        },
+        annotationLabel: {
+            type: DataTypes.INTEGER //0 for accurate, 1 for inaccurate
         }
         // no reply or quote count because we can't show them 
     }, {

@@ -16,20 +16,24 @@ router.route('/bulk-accuracy-labels') //for the pre-task
 
     let user = await db.User.findByPk(req.user.id);
 
-    let labelProms = req.body.labels.map(label => {
+    console.log(req.body)
+
+    let labelProms = Object.entries(req.body.labels).map( ([tweetId, labelObj]) => {
        return Promise.all([
             db.AccuracyLabel.create({
                 AIAssigned: 0,
-                value: label.value,
-                reason: label.reason,
+                value: labelObj.value,
+                reason: labelObj.reason,
                 version: 1
             }),
-            db.Tweet.findByPk(label.tweetId)
+            db.Tweet.findByPk(tweetId)
         ])
         .then((results) => {
             let newTweetLabel = results[0];
             let tweet = results[1];
-            return Promise.all([user.addUserAccuracyLabels(newTweetLabel), tweet.addTweetAccuracyLabels(newTweetLabel)]);
+            return Promise.all([user.addUserAccuracyLabels(newTweetLabel),
+                newTweetLabel.setUser(user), 
+                tweet.addTweetAccuracyLabels(newTweetLabel)]);
         })
     });
 
@@ -90,7 +94,7 @@ router.route('/accuracy-label/:tweet_id')
     
     let [user, tweet] = await Promise.all([userProm, tweetProm]);
 
-    let associationProms = [user.addUserAccuracyLabels(newTweetLabel), tweet.addTweetAccuracyLabels(newTweetLabel)];
+    let associationProms = [user.addUserAccuracyLabels(newTweetLabel), newTweetLabel.setUser(user), tweet.addTweetAccuracyLabels(newTweetLabel)];
     util.submitTrainingData(req.user.id);
 
     res.send({ message: 'updated', data: newTweetLabel });

@@ -27,7 +27,7 @@ module.exports = async function() {
             })
             .then(([tweet, created]) => {
                 if (created) {
-                    db.TweetSource.findOrCreate({
+                    return db.TweetSource.findOrCreate({
                         where: {
                             username: el.username
                         },
@@ -37,9 +37,10 @@ module.exports = async function() {
                         }
                     })
                     .then(([tweetSource, _]) => {
-                        tweet.setTweetSource(tweetSource);
+                        return tweet.setTweetSource(tweetSource);
                     })
                 }
+                else return new Promise((resolve)=> resolve());
                 
             })
         })
