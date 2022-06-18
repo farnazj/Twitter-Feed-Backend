@@ -31,6 +31,9 @@ router.route('/tweets')
     else {
 
         tweets = await db.Tweet.findAll({
+            where: {
+                preTask: false
+            },
             include: [{
                 model: db.AccuracyLabel,
                 as: 'TweetAccuracyLabels',

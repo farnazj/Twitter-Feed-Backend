@@ -16,7 +16,8 @@ router.route('/bulk-accuracy-labels') //for the pre-task
 
     let user = await db.User.findByPk(req.user.id);
 
-    console.log(req.body)
+    user.completedPreTask = true;
+    user.save();
 
     let labelProms = Object.entries(req.body.labels).map( ([tweetId, labelObj]) => {
        return Promise.all([
@@ -37,9 +38,21 @@ router.route('/bulk-accuracy-labels') //for the pre-task
         })
     });
 
-    await Promise.all(labelProms);
+    let newLabels = await Promise.all(labelProms);
 
-    util.submitTrainingData(req.user.id);
+    util.submitTrainingData(req.user.id, newLabels);
+    let modelConfig = await user.getModelConfig();
+
+    //initialize checking for updates from the model
+    predictionsQueue.add({
+        userId: req.user.id,
+        modelConfig: modelConfig
+    }, {
+        repeat: {
+            every: 10000
+        }
+    });
+
     res.send({ message: 'Labels updated' });
 }));   
 

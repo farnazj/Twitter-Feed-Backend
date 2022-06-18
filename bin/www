@@ -11,10 +11,11 @@ const db = require('../models');
 const WebSocketServer = require('ws').Server;
 const sessConfig = require('../lib/sessionConfig').sessConfig;
 var url = require('url');
-let userIdSocketMapping = {}
+userIdSocketMapping = {}
 const logger = require('../lib/logger');
 require('../lib/predictionsQueueProcessor').processRealTimeQueue(userIdSocketMapping);
 var registerTweets = require('../registerTweets');
+const { crossOriginEmbedderPolicy } = require('helmet');
 
 /**
  * Get port from environment and store in Express.
@@ -43,18 +44,15 @@ var wss = new WebSocketServer({
 
 wss.on('connection', async function connection(ws, req) {
 
-  logger.silly('incoming connection ' + JSON.stringify(ws))
+
+  console.log('incoming connection\n', ws)
   try {
     if (!req.session.passport || !req.session.passport.user)
+      // console.log(req.session, req.session.passport, req.session.passport.user);
+
       throw { type: 'unauthorized', message: 'User is not logged in' };
 
-      const parameters = url.parse(req.url, true);
-
-      let user = await db.User.findOne({
-        where: {
-          email: parameters.query.email
-        }
-      });
+      let user = await db.User.findByPk(req.session.passport.user);
 
       if (!user)
         throw { type: 'unauthorized', message: 'Something is wrong' };
@@ -62,7 +60,8 @@ wss.on('connection', async function connection(ws, req) {
       ws.isAlive = true;
       ws.on('pong', heartbeat);
 
-      ws.userId = user.id;
+      ws.userId = req.session.passport.user;
+      console.log('ws.user id', ws.userId, req.session.passport)
       userIdSocketMapping[ws.userId] = ws;
 
       ws.on('message', async (message) => {
