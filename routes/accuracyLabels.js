@@ -9,6 +9,7 @@ var db  = require('../models');
 const logger = require('../lib/logger');
 var util = require('../lib/util');
 var routeHelpers = require('../lib/routeHelpers');
+const { use } = require('passport');
 
 
 router.route('/bulk-accuracy-labels') //for the pre-task
@@ -25,7 +26,8 @@ router.route('/bulk-accuracy-labels') //for the pre-task
                 AIAssigned: 0,
                 value: labelObj.value,
                 reason: labelObj.reason,
-                version: 1
+                version: 1,
+                condition: user.condition
             }),
             db.Tweet.findByPk(tweetId)
         ])
@@ -40,8 +42,15 @@ router.route('/bulk-accuracy-labels') //for the pre-task
 
     let newLabels = await Promise.all(labelProms);
 
+    let modelConfig = (await user.getUserModelConfigs({
+        where: {
+            condition: user.condition
+        }
+    }))[0];
+
+    console.log(modelConfig, 'model config')
+
     util.submitTrainingData(req.user.id, newLabels);
-    let modelConfig = await user.getModelConfig();
 
     //initialize checking for updates from the model
     predictionsQueue.add({
@@ -59,6 +68,9 @@ router.route('/bulk-accuracy-labels') //for the pre-task
 router.route('/accuracy-label/:tweet_id')
 .get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
 
+    let user = await db.User.findByPk(req.user.id);
+    let condition = user.condition;
+
     let accuracyLabel = await db.AccuracyLabel.findOne({
         where: {
             UserId: {
@@ -67,7 +79,8 @@ router.route('/accuracy-label/:tweet_id')
             TweetId: {
                 [Op.eq]: req.params.tweet_id
             },
-            version: 1
+            version: 1,
+            condition: condition
         }
     });
 
@@ -76,8 +89,8 @@ router.route('/accuracy-label/:tweet_id')
 
 .post(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
 
-    let userProm = db.User.findByPk(req.user.id);
-    let tweetProm = db.Tweet.findByPk(req.tweet.id);
+    let user = await db.User.findByPk(req.user.id);
+    let tweetProm = db.Tweet.findByPk(req.params.tweet_id);
 
     let existingAccuracyLabels = await db.AccuracyLabel.findAll({
         where: {
@@ -86,7 +99,8 @@ router.route('/accuracy-label/:tweet_id')
             },
             TweetId: {
                 [Op.eq]: req.params.tweet_id
-            }
+            },
+            condition: user.condition
         }
     });
 
@@ -98,16 +112,18 @@ router.route('/accuracy-label/:tweet_id')
     await Promise.all(tweetPrevLabelsProms);
 
     
-    let newTweetLabel = await AccuracyLabel.create({
+    let newTweetLabel = await db.AccuracyLabel.create({
         AIAssigned: 0,
         value: req.body.value,
         reason: req.body.reason,
-        version: 1
+        version: 1,
+        condition: user.condition
     });
     
-    let [user, tweet] = await Promise.all([userProm, tweetProm]);
+    let tweet = await tweetProm;
 
     let associationProms = [user.addUserAccuracyLabels(newTweetLabel), newTweetLabel.setUser(user), tweet.addTweetAccuracyLabels(newTweetLabel)];
+    await Promise.all(associationProms);
     util.submitTrainingData(req.user.id);
 
     res.send({ message: 'updated', data: newTweetLabel });

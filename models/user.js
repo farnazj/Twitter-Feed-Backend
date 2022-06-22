@@ -7,18 +7,21 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       email: {
-          type: DataTypes.STRING,
-          validate: {
-            isEmail: true 
-          }
+        type: DataTypes.STRING,
+        validate: {
+          isEmail: true 
+        }
       },
       isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
       },
       completedPreTask: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: false
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+      },
+      condition: {
+        type: DataTypes.STRING
       }
     });
   
@@ -32,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
 
     User.associate = function (models) {
         models.User.hasMany(models.AccuracyLabel, { as: 'UserAccuracyLabels' });
-        models.User.hasOne(models.ModelConfig);
+        models.User.hasMany(models.ModelConfig, { as: 'UserModelConfigs' });
     };
 
     return User;

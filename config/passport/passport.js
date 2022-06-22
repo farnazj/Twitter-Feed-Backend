@@ -14,46 +14,45 @@ module.exports = function(passport) {
 
         function(req, username, password, done) {
 
-            User.findOne({
-              where: {
-                email: username
+          User.findOne({
+            where: {
+              email: username
+            }
+          }).then(function(user) {
+
+              if (user)
+              {
+                return done(null, false, {
+                  message: 'That email is already taken'
+                });
               }
-            }).then(function(user) {
+              else {
+                  routeHelpers.generateHash(password).then((userPassword) => {
+                      
+                    User.create({ passwordHash: userPassword, email: username })
+                    .then((newUser, created) => {
+                      if (!newUser) {
+                          return done(null, false, { message: 'Sth went wrong' });
+                      }
+                      else {
+                          return done(null, newUser, { message: 'New user created', type: 'NEW_USER' });
+                      }
 
-                if (user)
-                {
-                  return done(null, false, {
-                    message: 'That email is already taken'
-                  });
-                }
-                else {
-                    routeHelpers.generateHash(password).then((userPassword) => {
-                        
-                        User.create({ passwordHash: userPassword, email: username }).then((newUser, created) => {
-                            console.log('inja umad',newUser )
-                            if (!newUser) {
-                                return done(null, false, { message: 'Sth went wrong' });
-                            }
-                            else {
-                                return done(null, newUser, { message: 'New user created', type: 'NEW_USER' });
-                            }
+                    })
+                  }
 
-                        })
-                    }
+              )}
 
-                )}
-
-            })
-            .catch(function(reason) {
-                return done(null, false, { message: reason });
-            });
+          })
+          .catch(function(reason) {
+              return done(null, false, { message: reason });
+          });
 
         }
 
     ));
 
     passport.serializeUser(function(user, done) {
-      console.log('going to serialize', user.id)
       done(null, user.id);
     });
 

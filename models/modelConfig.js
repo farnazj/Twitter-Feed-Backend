@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         workspace: {
             type: DataTypes.STRING
+        },
+        condition: {
+            type: DataTypes.STRING
         }
        
     }, {

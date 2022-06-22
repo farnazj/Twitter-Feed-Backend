@@ -45,7 +45,7 @@ var wss = new WebSocketServer({
 wss.on('connection', async function connection(ws, req) {
 
 
-  console.log('incoming connection\n', ws)
+  console.log('incoming connection\n')
   try {
     if (!req.session.passport || !req.session.passport.user)
       // console.log(req.session, req.session.passport, req.session.passport.user);
@@ -61,8 +61,26 @@ wss.on('connection', async function connection(ws, req) {
       ws.on('pong', heartbeat);
 
       ws.userId = req.session.passport.user;
-      console.log('ws.user id', ws.userId, req.session.passport)
+      console.log('ws.user id', ws.userId)
       userIdSocketMapping[ws.userId] = ws;
+
+      if (user.completedPreTask) {
+
+        let modelConfig = (await user.getUserModelConfigs({
+          where: {
+            condition: user.condition
+          }
+        }))[0];
+
+        predictionsQueue.add({
+          userId: user.id,
+          modelConfig: modelConfig
+        }, {
+            repeat: {
+                every: 10000
+            }
+        });
+      }
 
       ws.on('message', async (message) => {
         let messageParsed = JSON.parse(message);

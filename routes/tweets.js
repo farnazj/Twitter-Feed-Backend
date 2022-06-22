@@ -8,6 +8,7 @@ var constants = require('../lib/constants');
 var db  = require('../models');
 const logger = require('../lib/logger');
 var routeHelpers = require('../lib/routeHelpers');
+const user = require('../models/user');
 
 
 router.route('/tweets')
@@ -30,6 +31,8 @@ router.route('/tweets')
     }
     else {
 
+        let user = await db.User.findByPk(req.user.id);
+
         tweets = await db.Tweet.findAll({
             where: {
                 preTask: false
@@ -41,7 +44,8 @@ router.route('/tweets')
                     UserId: {
                         [Op.eq]: req.user.id
                     },
-                    version: 1
+                    version: 1,
+                    condition: user.condition
                 }
             }, {
                 model: db.TweetSource
@@ -51,7 +55,6 @@ router.route('/tweets')
     }
     
     res.send(tweets);
-
 }));
 
 module.exports = router;
