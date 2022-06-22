@@ -104,29 +104,45 @@ router.route('/accuracy-label/:tweet_id')
         }
     });
 
-    let tweetPrevLabelsProms = existingAccuracyLabels.map(label => {
-        label.version = label.version - 1;
-        return label.save();
-    })
+    let returnedLabel;
 
-    await Promise.all(tweetPrevLabelsProms);
+    if (req.body.reason) {
+        console.log('existing labels', existingAccuracyLabels)
 
+        let mostRecentLabel = existingAccuracyLabels.filter(label => label.version == 1)[0];
+        mostRecentLabel.reason = req.body.reason;
+        await mostRecentLabel.save();
+        returnedLabel = mostRecentLabel;
+    }
+    else {
+
+        let tweetPrevLabelsProms = existingAccuracyLabels.map(label => {
+            label.version = label.version - 1;
+            return label.save();
+        })
     
-    let newTweetLabel = await db.AccuracyLabel.create({
-        AIAssigned: 0,
-        value: req.body.value,
-        reason: req.body.reason,
-        version: 1,
-        condition: user.condition
-    });
+        await Promise.all(tweetPrevLabelsProms);
     
-    let tweet = await tweetProm;
+        
+        let newTweetLabel = await db.AccuracyLabel.create({
+            AIAssigned: 0,
+            value: req.body.value,
+            version: 1,
+            condition: user.condition
+        });
+        
+        let tweet = await tweetProm;
+    
+        let associationProms = [user.addUserAccuracyLabels(newTweetLabel), newTweetLabel.setUser(user), tweet.addTweetAccuracyLabels(newTweetLabel)];
+        await Promise.all(associationProms);
+        util.submitTrainingData(req.user.id);
+        
+        returnedLabel = newTweetLabel;
+    }
 
-    let associationProms = [user.addUserAccuracyLabels(newTweetLabel), newTweetLabel.setUser(user), tweet.addTweetAccuracyLabels(newTweetLabel)];
-    await Promise.all(associationProms);
-    util.submitTrainingData(req.user.id);
 
-    res.send({ message: 'updated', data: newTweetLabel });
+
+    res.send({ message: 'updated', data: returnedLabel });
 
 }))
 
