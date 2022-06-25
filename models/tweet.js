@@ -34,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     Tweet.associate = function (models) {
         models.Tweet.hasOne(models.TweetSource);
         models.Tweet.hasMany(models.AccuracyLabel, { as: 'TweetAccuracyLabels' });
+        models.Tweet.hasMany(models.Media, { as: 'TweetMedia' });
     };
 
     return Tweet;

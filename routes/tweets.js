@@ -54,6 +54,8 @@ router.route('/tweets')
         });
     }
     
+    console.log('tweets', tweets.map(el => el.id))
+
     res.send(tweets);
 }));
 
