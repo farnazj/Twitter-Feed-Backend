@@ -58,20 +58,25 @@ router.route('/signup')
 
     if (user) {
       //TODO: put user in a condition and save it on the user instance
-      user.condition = 'test';
-      user.save()
-      .then(() => {
-        db.ModelConfig.create({
-          workspace: user.email + '-' + util.makeRandomId(7),
-          condition: user.condition
-        })
-        .then((modelConfig) => {
-          user.addUserModelConfig(modelConfig)
-          .then(() => {
-            res.status(200).send({ message: `Thanks for signing up! Your account is all set.` })
+      db.Condition.create({
+        value: req.body.exp == 'RQ1' ? 'RQ1A' : 'RQ2A'
+      })
+      .then((condition) => {
+        user.addUserCondition(condition)
+        .then(() => {
+          db.ModelConfig.create({
+            workspace: user.email + '-' + util.makeRandomId(7),
+            condition: condition.value
+          })
+          .then((modelConfig) => {
+            user.addUserModelConfig(modelConfig)
+            .then(() => {
+              res.status(200).send({ message: `Thanks for signing up! Your account is all set.` })
+            })
           })
         })
       })
+      
 
     }
     else {

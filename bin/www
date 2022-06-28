@@ -53,6 +53,11 @@ wss.on('connection', async function connection(ws, req) {
       throw { type: 'unauthorized', message: 'User is not logged in' };
 
       let user = await db.User.findByPk(req.session.passport.user);
+      let userCondition = (await user.getUserConditions({
+        where: {
+          version: 1
+        }
+      }))[0];
 
       if (!user)
         throw { type: 'unauthorized', message: 'Something is wrong' };
@@ -61,14 +66,13 @@ wss.on('connection', async function connection(ws, req) {
       ws.on('pong', heartbeat);
 
       ws.userId = req.session.passport.user;
-      console.log('ws.user id', ws.userId)
       userIdSocketMapping[ws.userId] = ws;
 
       if (user.completedPreTask) {
 
         let modelConfig = (await user.getUserModelConfigs({
           where: {
-            condition: user.condition
+            condition: userCondition.value
           }
         }))[0];
 

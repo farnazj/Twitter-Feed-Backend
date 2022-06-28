@@ -25,6 +25,10 @@ router.route('/tweets')
             },
             include:[{
                 model: db.TweetSource,
+            }, {
+                model: db.Media,
+                as: 'TweetMedia',
+                required: false
             }],
             ...paginationReq
         });
@@ -32,29 +36,55 @@ router.route('/tweets')
     else {
 
         let user = await db.User.findByPk(req.user.id);
-
-        tweets = await db.Tweet.findAll({
+        let userCondition = (await user.getUserConditions({
             where: {
-                preTask: false
-            },
-            include: [{
-                model: db.AccuracyLabel,
-                as: 'TweetAccuracyLabels',
+              version: 1
+            }
+          }))[0];
+
+        
+        if (userCondition.value != 'RQ1A') {
+            tweets = await db.Tweet.findAll({
                 where: {
-                    UserId: {
-                        [Op.eq]: req.user.id
-                    },
-                    version: 1,
-                    condition: user.condition
-                }
-            }, {
-                model: db.TweetSource
-            }],
-            ...paginationReq
-        });
+                    preTask: false
+                },
+                include: [{
+                    model: db.AccuracyLabel,
+                    as: 'TweetAccuracyLabels',
+                    where: {
+                        UserId: {
+                            [Op.eq]: req.user.id
+                        },
+                        version: 1,
+                        condition: userCondition.value
+                    }
+                }, {
+                    model: db.TweetSource
+                }, {
+                    model: db.Media,
+                    as: 'TweetMedia',
+                    required: false
+                }],
+                ...paginationReq
+            });
+        }
+        else {
+            tweets = await db.Tweet.findAll({
+                where: {
+                    preTask: false
+                },
+                include: [ {
+                    model: db.TweetSource
+                }, {
+                    model: db.Media,
+                    as: 'TweetMedia',
+                    required: false
+                }],
+                ...paginationReq
+            });
+        }
+
     }
-    
-    console.log('tweets', tweets.map(el => el.id))
 
     res.send(tweets);
 }));

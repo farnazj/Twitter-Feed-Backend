@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
             validate: {
                 isUrl: true 
             }
+        },
+        verified: {
+           type: DataTypes.BOOLEAN
         }
     }, {
         charset: 'utf8mb4',
