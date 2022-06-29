@@ -2,8 +2,11 @@
 
 module.exports = (sequelize, DataTypes) => {
     const Condition = sequelize.define('Condition', {
-        value: {
+        experiment: {
             type: DataTypes.STRING
+        },
+        stage: {
+            type: DataTypes.INTEGER,
         },
         version: {
             type: DataTypes.INTEGER,

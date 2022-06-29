@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         condition: {
-            type: DataTypes.STRING
+            type: DataTypes.INTEGER
         }
        
     }, {

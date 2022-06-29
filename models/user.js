@@ -15,13 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
-      },
-      completedPreTask: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      },
-      condition: {
-        type: DataTypes.STRING
       }
     });
   
@@ -37,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       models.User.hasMany(models.AccuracyLabel, { as: 'UserAccuracyLabels' });
       models.User.hasMany(models.ModelConfig, { as: 'UserModelConfigs' });
       models.User.hasMany(models.Condition, { as: 'UserConditions' });
+      models.User.hasOne(models.TweetStage);
     };
 
     return User;

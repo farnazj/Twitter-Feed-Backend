@@ -72,7 +72,7 @@ wss.on('connection', async function connection(ws, req) {
 
         let modelConfig = (await user.getUserModelConfigs({
           where: {
-            condition: userCondition.value
+            condition: userCondition.stage
           }
         }))[0];
 

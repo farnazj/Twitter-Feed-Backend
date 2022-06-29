@@ -9,20 +9,49 @@ var db  = require('../models');
 const logger = require('../lib/logger');
 var routeHelpers = require('../lib/routeHelpers');
 const user = require('../models/user');
+const { where } = require('sequelize');
 
 
 router.route('/tweets')
 .get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
     let paginationReq = routeHelpers.getLimitOffset(req);
 
+
+    let user = await db.User.findByPk(req.user.id);
+  
+    let userConditions = await user.getUserConditions();
+    let mostRecentCondtion = userConditions.find(condition => condition.version == 1);
+
+
+    let tweetStageMapping = JSON.parse((await user.getTweetStage()).mappingsBlob);
+    let tweetsForStage = Object.entries(tweetStageMapping).filter(([tweetId, stage]) => stage == mostRecentCondtion.stage).map(el => parseInt(el[0]));
+
+    console.log(tweetStageMapping)
+    console.log('***')
+    console.log(tweetsForStage)
+
     let tweets;
-    if (typeof req.headers.pretask !== 'undefined' && req.headers.pretask == 'true') { //for fetching the subset of tweets that the user needs to assess in the pre-task
+
+    let whereConfig = {};
+    if (mostRecentCondtion.stage == 0) {
+        whereConfig = {
+            preTask: {
+                [Op.eq]: true
+            }
+        }
+    }
+    else {
+        whereConfig = {
+            id: {
+                [Op.in]: tweetsForStage
+            }
+        }
+    }
+
+    if (mostRecentCondtion.stage <= 1) {
+
         tweets = await db.Tweet.findAll({
-            where: {
-                preTask: {
-                    [Op.eq]: true
-                }
-            },
+            where: whereConfig,
             include:[{
                 model: db.TweetSource,
             }, {
@@ -35,56 +64,32 @@ router.route('/tweets')
     }
     else {
 
-        let user = await db.User.findByPk(req.user.id);
-        let userCondition = (await user.getUserConditions({
-            where: {
-              version: 1
-            }
-          }))[0];
-
-        
-        if (userCondition.value != 'RQ1A') {
-            tweets = await db.Tweet.findAll({
+        tweets = await db.Tweet.findAll({
+            where: whereConfig,
+            include: [{
+                model: db.AccuracyLabel,
+                as: 'TweetAccuracyLabels',
                 where: {
-                    preTask: false
-                },
-                include: [{
-                    model: db.AccuracyLabel,
-                    as: 'TweetAccuracyLabels',
-                    where: {
-                        UserId: {
-                            [Op.eq]: req.user.id
-                        },
-                        version: 1,
-                        condition: userCondition.value
-                    }
-                }, {
-                    model: db.TweetSource
-                }, {
-                    model: db.Media,
-                    as: 'TweetMedia',
-                    required: false
-                }],
-                ...paginationReq
-            });
-        }
-        else {
-            tweets = await db.Tweet.findAll({
-                where: {
-                    preTask: false
-                },
-                include: [ {
-                    model: db.TweetSource
-                }, {
-                    model: db.Media,
-                    as: 'TweetMedia',
-                    required: false
-                }],
-                ...paginationReq
-            });
-        }
+                    UserId: {
+                        [Op.eq]: req.user.id
+                    },
+                    version: 1,
+                    // condition: mostRecentCondtion.stage
+                }
+            }, {
+                model: db.TweetSource
+            }, {
+                model: db.Media,
+                as: 'TweetMedia',
+                required: false
+            }],
+            ...paginationReq
+        });
+    
 
     }
+
+    console.log('returned tweets', tweets)
 
     res.send(tweets);
 }));

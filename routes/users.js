@@ -8,7 +8,7 @@ var constants = require('../lib/constants');
 var db  = require('../models');
 const logger = require('../lib/logger');
 var routeHelpers = require('../lib/routeHelpers');
-
+var util = require('../lib/util');
 
 
 router.route('/users/:id')
@@ -45,21 +45,8 @@ router.route('/users/:id/update-condition')
     let user = await db.User.findByPk(req.params.id);
     let conditions = await user.getUserConditions();
 
-    let mostRecentCondtion = conditions.find(condition => condition.version == 1);
-
-    let proms = conditions.map(condition => {
-        condition.version = condition.version - 1;
-        return condition.save();
-    });
-
-    let nextCondtion = mostRecentCondtion.value == 'RQ1A' ? 'RQ1B' : 'TODO';
-
-    let newCondition = await db.condition.create({
-        version: 1,
-        value: nextCondtion
-    });
-
-    await Promise.all([user.addUserCondition(newCondition), ...proms ]);
+    await util.advanceStage(conditions, user);
+    
     res.send({ message: 'condition update is complete', condition: newCondition });
 }));
 
