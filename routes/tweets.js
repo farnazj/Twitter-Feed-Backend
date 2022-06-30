@@ -16,12 +16,10 @@ router.route('/tweets')
 .get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
     let paginationReq = routeHelpers.getLimitOffset(req);
 
-
     let user = await db.User.findByPk(req.user.id);
   
     let userConditions = await user.getUserConditions();
     let mostRecentCondtion = userConditions.find(condition => condition.version == 1);
-
 
     let tweetStageMapping = JSON.parse((await user.getTweetStage()).mappingsBlob);
     let tweetsForStage = Object.entries(tweetStageMapping).filter(([tweetId, stage]) => stage == mostRecentCondtion.stage).map(el => parseInt(el[0]));
