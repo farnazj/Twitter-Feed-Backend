@@ -89,7 +89,7 @@ router.route('/tweets')
 
     }
 
-    console.log('returned tweets', tweets)
+    // console.log('returned tweets', tweets)
 
     res.send(tweets);
 }));

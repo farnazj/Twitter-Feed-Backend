@@ -27,7 +27,25 @@ router.route('/login')
         if (err) {
           return next(err);
         }
-        return res.send({'user': user});
+
+        db.User.findOne({
+          where: {
+              id: user.id
+          },
+          include: [{
+              model: db.Condition,
+              as: 'UserConditions',
+              where: {
+                  version: 1
+              }
+          }]
+      })
+      .then(expandedUser => {
+        // console.log('expnaded user', expandedUser)
+        return res.send({'user': expandedUser});
+      })
+
+
       });
     }
   })(req, res, next)
@@ -90,14 +108,12 @@ router.route('/signup')
 
       proms.push(user.addUserCondition(condition));
 
-      let modelConfig = await db.ModelConfig.create({
-        workspace: user.email + '-' + util.makeRandomId(7),
-        condition: condition.stage
-      })
-
-      proms.push(user.addUserModelConfig(modelConfig));
+      proms.push(util.modelSetup(user));
 
       await Promise.all(proms);
+
+      let allJobs = await predictionsQueue.getJobs()
+      console.log('adding to prediction queue?', allJobs)
 
       res.status(200).send({ message: `Thanks for signing up! Your account is all set.` })
       

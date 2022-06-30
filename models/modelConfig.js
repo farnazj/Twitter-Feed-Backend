@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         workspace: {
             type: DataTypes.STRING
         },
-        condition: {
+        forStage: {
             type: DataTypes.INTEGER
         }
        

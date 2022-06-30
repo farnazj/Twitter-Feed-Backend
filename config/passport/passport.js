@@ -80,7 +80,7 @@ module.exports = function(passport) {
         User.findOne({where: { email: username }}).then(function(user) {
 
           // if no user is found, return the message
-          console.log('user is found?', user)
+          // console.log('user is found?', user)
           if (!user)
               return done(null, false, { message: 'No user found with the given email' });
           if (!user.isVerified)

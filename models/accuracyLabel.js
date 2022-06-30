@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
         reason: {
             type: DataTypes.TEXT('long')
         },
-        condition: {
-            type: DataTypes.STRING
+        stage: {
+            type: DataTypes.INTEGER
         }
        
     }, {

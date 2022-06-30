@@ -68,23 +68,42 @@ wss.on('connection', async function connection(ws, req) {
       ws.userId = req.session.passport.user;
       userIdSocketMapping[ws.userId] = ws;
 
-      if (user.completedPreTask) {
+      let modelConfigs = (await user.getUserModelConfigs({
+        where: {
+          iteration: 0
+        }
+      }));
+      
+      if (modelConfigs.length) {
 
-        let modelConfig = (await user.getUserModelConfigs({
-          where: {
-            condition: userCondition.stage
-          }
-        }))[0];
+        console.log('aya user config dare?')
 
-        predictionsQueue.add({
-          userId: user.id,
-          modelConfig: modelConfig
-        }, {
-            repeat: {
-                every: 10000
+        let allRepeatableJobs = await predictionsQueue.getRepeatableJobs;
+        let userJobIds = allRepeatableJobs.filter(job => [`stage1-modelcheck-user${user.id}`, `stage2-modelcheck-user${user.id}`].includes(job.opts.jobId) ).map(el =>
+          el.opts.jobId);
+
+        console.log('user che jobhaE dare', userJobIds)
+
+          for (let stageIndex = 0 ; stageIndex < 2 ; stageIndex++) {
+
+            if (!userJobIds.includes('`stage1-modelcheck-user${user.id}`')) {
+              await predictionsQueue.add(
+                {
+                    userId: user.id,
+                    modelConfig: config[stageIndex]
+                },
+                {
+                    repeat: {
+                        every: 10000
+                    },
+                    jobId: `stage${stageIndex + 1}-modelcheck-user${user.id}`,
+
+                }
+              )
             }
-        });
+          }
       }
+      
 
       ws.on('message', async (message) => {
         let messageParsed = JSON.parse(message);
