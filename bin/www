@@ -46,10 +46,10 @@ wss.on('connection', async function connection(ws, req) {
 
 
   console.log('incoming connection\n')
+  console.log(req.session.passport)
   try {
     if (!req.session.passport || !req.session.passport.user)
       // console.log(req.session, req.session.passport, req.session.passport.user);
-
       throw { type: 'unauthorized', message: 'User is not logged in' };
 
       let user = await db.User.findByPk(req.session.passport.user);
@@ -78,9 +78,10 @@ wss.on('connection', async function connection(ws, req) {
 
         console.log('user already has configs')
 
-        let allRepeatableJobs = await predictionsQueue.getRepeatableJobs;
-        let userJobIds = allRepeatableJobs.filter(job => [`stage1-modelcheck-user${user.id}`, `stage2-modelcheck-user${user.id}`].includes(job.opts.jobId) ).map(el =>
-          el.opts.jobId);
+        let allRepeatableJobs = await predictionsQueue.getRepeatableJobs();
+        console.log('all repeatable jobs', allRepeatableJobs)
+        let userJobIds = allRepeatableJobs.filter(job => [`stage1-modelcheck-user${user.id}`, `stage2-modelcheck-user${user.id}`].includes(job.id) ).map(el =>
+          el.id);
 
         console.log('user che jobhaE dare', userJobIds)
 
@@ -90,7 +91,7 @@ wss.on('connection', async function connection(ws, req) {
               await predictionsQueue.add(
                 {
                     userId: user.id,
-                    modelConfig: config[stageIndex]
+                    modelConfig: modelConfigs[stageIndex]
                 },
                 {
                   repeat: {
@@ -114,6 +115,8 @@ wss.on('connection', async function connection(ws, req) {
       });
 
       ws.on('close', function close() {
+
+        console.log('websocket is closing', ws.userId);
         if (ws.userId in userIdSocketMapping)
           delete userIdSocketMapping[ws.userId];
       });
@@ -129,6 +132,7 @@ wss.on('connection', async function connection(ws, req) {
 const interval = setInterval(function ping() {
 
 wss.clients.forEach(function each(ws) {
+  console.log('is ws alive', ws.alive)
   if (ws.isAlive === false) {
     if (ws.userId in userIdSocketMapping)
       delete userIdSocketMapping[ws.userId];
@@ -142,7 +146,9 @@ wss.clients.forEach(function each(ws) {
 }, 30000);
 
 wss.on('close', function close() {
-clearInterval(interval);
+
+  console.log('on close')
+  clearInterval(interval);
 });
 
 function noop() {}

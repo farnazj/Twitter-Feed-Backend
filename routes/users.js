@@ -42,4 +42,23 @@ router.route('/users/:id/update-condition')
     res.send({ message: 'condition update is complete', condition: newCondition });
 }));
 
+
+
+router.route('/users/:id/end-study')
+.post(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
+    let user = await db.User.findByPk(req.params.id);
+    let allRepeatableJobs = await predictionsQueue.getRepeatableJobs();
+
+    console.log('all repeatable jobs', allRepeatableJobs)
+    let userJobkeys = allRepeatableJobs.filter(job => [`stage1-modelcheck-user${user.id}`, `stage2-modelcheck-user${user.id}`].includes(job.id) ).map(el =>
+      el.key);
+
+    for (let jobKey of userJobkeys) {
+        await predictionsQueue.removeRepeatableByKey(jobKey);
+    }
+
+    res.send({ message: 'ended study' });
+
+}));
+
 module.exports = router;
