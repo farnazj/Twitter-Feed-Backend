@@ -132,7 +132,6 @@ wss.on('connection', async function connection(ws, req) {
 const interval = setInterval(function ping() {
 
 wss.clients.forEach(function each(ws) {
-  console.log('is ws alive', ws.alive)
   if (ws.isAlive === false) {
     if (ws.userId in userIdSocketMapping)
       delete userIdSocketMapping[ws.userId];

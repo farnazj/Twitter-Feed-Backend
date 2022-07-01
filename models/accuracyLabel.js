@@ -24,8 +24,11 @@ module.exports = (sequelize, DataTypes) => {
         stage: {
             type: DataTypes.INTEGER
         },
-        notes: {
-            type: DataTypes.STRING
+        timeSinceFeedLoaded: {
+            type: DataTypes.INTEGER
+        },
+        notesBlob: {
+            type: DataTypes.TEXT('long')
         }
        
     }, {

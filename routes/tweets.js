@@ -82,8 +82,7 @@ router.route('/tweets')
                 required: false
             }],
             ...paginationReq
-        });
-    
+        });    
 
     }
 

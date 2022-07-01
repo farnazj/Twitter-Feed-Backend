@@ -16,13 +16,6 @@ var routeHelpers = require('../lib/routeHelpers');
 router.route('/accuracy-label/:tweet_id')
 .get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
 
-    // let user = await db.User.findByPk(req.user.id);
-    // let userCondition = (await user.getUserConditions({
-    //     where: {
-    //       version: 1
-    //     }
-    //   }))[0];
-
     let accuracyLabel = await db.AccuracyLabel.findOne({
         where: {
             UserId: {
@@ -32,7 +25,6 @@ router.route('/accuracy-label/:tweet_id')
                 [Op.eq]: req.params.tweet_id
             },
             version: 1,
-            // condition: userCondition.stage
         }
     });
 
@@ -41,6 +33,7 @@ router.route('/accuracy-label/:tweet_id')
 
 .post(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
 
+    console.log('req body', req.body)
     let user = await db.User.findByPk(req.user.id);
     let userCondition = (await user.getUserConditions({
         where: {
@@ -65,15 +58,22 @@ router.route('/accuracy-label/:tweet_id')
 
     let returnedLabel;
 
-    if (req.body.reason) {
+    if (req.body.reason || req.body.confidence) {
         console.log('existing labels', existingAccuracyLabels)
 
         let mostRecentLabel = existingAccuracyLabels.filter(label => label.version == 1)[0];
-        mostRecentLabel.reason = req.body.reason;
+
+        if (req.body.reason)
+            mostRecentLabel.reason = req.body.reason;
+        if (req.body.confidence)
+            mostRecentLabel.confidence = req.body.confidence;
+
         await mostRecentLabel.save();
         returnedLabel = mostRecentLabel;
     }
     else {
+
+        let mostRecentLabelByUser = existingAccuracyLabels.find(label => label.version == 1 && label.assessor == 0);
 
         let tweetPrevLabelsProms = existingAccuracyLabels.map(label => {
             label.version = label.version - 1;
@@ -81,13 +81,20 @@ router.route('/accuracy-label/:tweet_id')
         })
     
         await Promise.all(tweetPrevLabelsProms);
-    
+        
+        let extraData =  {};
+        if (mostRecentLabelByUser) {
+            extraData.confidence = mostRecentLabelByUser.confidence;
+            extraData.reason = mostRecentLabelByUser.reason;
+        }
         
         let newTweetLabel = await db.AccuracyLabel.create({
             assessor: 0,
             value: req.body.value,
             version: 1,
-            stage: userCondition.stage
+            stage: userCondition.stage,
+            timeSinceFeedLoaded: req.body.timeSinceFeedLoaded,
+            ...extraData
         });
         
         let tweet = await tweetProm;
