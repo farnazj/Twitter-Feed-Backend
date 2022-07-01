@@ -84,7 +84,7 @@ router.route('/accuracy-label/:tweet_id')
     
         
         let newTweetLabel = await db.AccuracyLabel.create({
-            AIAssigned: 0,
+            assessor: 0,
             value: req.body.value,
             version: 1,
             stage: userCondition.stage

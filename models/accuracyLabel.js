@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             defaultValue: 1
         },
-        AIAssigned: {
-            type: DataTypes.BOOLEAN //1 for AI, 0 for user
+        assessor: {
+            type: DataTypes.INTEGER //0 for user, 1 for AI, 2 for other
         },
         changedLastInIteration: {
             type: DataTypes.INTEGER
@@ -15,11 +15,17 @@ module.exports = (sequelize, DataTypes) => {
         value: {
             type: DataTypes.INTEGER //0 for accurate or NA, 1 for inaccurate
         },
+        confidence: {
+            type: DataTypes.INTEGER //1-5
+        },
         reason: {
             type: DataTypes.TEXT('long')
         },
         stage: {
             type: DataTypes.INTEGER
+        },
+        notes: {
+            type: DataTypes.STRING
         }
        
     }, {
