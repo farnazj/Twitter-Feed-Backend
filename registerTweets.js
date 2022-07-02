@@ -18,7 +18,8 @@ module.exports = async function() {
                 text: el.text,
                 retweetCount: el.retweet_count,
                 likeCount: el.like_count,
-                preTask: el.pre_task
+                preTask: el.pre_task,
+                index: el.index
             }
         })
         .then(([tweet, created]) => {
@@ -29,7 +30,8 @@ module.exports = async function() {
                     },
                     defaults: {
                         name: el.name,
-                        imageUrl: el.profile_image_url
+                        imageUrl: el.profile_image_url,
+                        verified: el.verified == 'True'? true : false
                     }
                 })];
 
@@ -45,13 +47,13 @@ module.exports = async function() {
                 Promise.all(allProms)
                 .then((res) => {
 
-                    console.log('result is', res)
-                    console.log('tweet is ', tweet)
+                    // console.log('result is', res)
+                    // console.log('tweet is ', tweet)
                     let tweetSource;
                     let proms = [];
 
                     if (el.type !== null) {
-                        console.log('dakhele in ', res)
+                        // console.log('dakhele in ', res)
                         tweetSource = res[0][0];
                         let media = res[1]
                         proms.push(tweet.addTweetMedia(media));

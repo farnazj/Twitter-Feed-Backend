@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
         tweetId: {
             type: DataTypes.STRING
         },
+        index: {
+            type: DataTypes.INTEGER
+        },
         elementId: {
             type: DataTypes.STRING //element id defined by the sleuth backend
         },

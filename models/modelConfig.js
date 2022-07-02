@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         forStage: {
             type: DataTypes.INTEGER
+        },
+        documentId: {
+            type: DataTypes.STRING
         }
        
     }, {

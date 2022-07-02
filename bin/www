@@ -15,8 +15,7 @@ userIdSocketMapping = {}
 const logger = require('../lib/logger');
 require('../lib/predictionsQueueProcessor').processRealTimeQueue(userIdSocketMapping);
 var registerTweets = require('../registerTweets');
-const { crossOriginEmbedderPolicy } = require('helmet');
-
+var registerDataset = require('../registerDataset');
 /**
  * Get port from environment and store in Express.
  */
@@ -161,7 +160,7 @@ this.isAlive = true;
  */
 
 db.sequelize.sync().then(async function() {
-  await registerTweets();
+  await Promise.all([registerTweets(), registerDataset()]);
 
   server.listen(port);
   server.on('error', onError);

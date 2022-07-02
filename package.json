@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
     "bull": "^4.8.3",
@@ -17,6 +18,7 @@
     "dotenv": "^16.0.1",
     "express": "~4.16.1",
     "express-session": "^1.17.3",
+    "form-data": "^4.0.0",
     "helmet": "^5.1.0",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
