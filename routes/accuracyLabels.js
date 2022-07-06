@@ -106,10 +106,10 @@ router.route('/accuracy-label/:tweet_id')
        
         if (userCondition.stage == 0) {
             for (let stage of [1, 2])
-                util.submitTrainingData(req.user.id, {tweetId: req.params.tweet_id, value: req.body.value}, stage);
+                util.submitTrainingData(req.user.id, req.params.tweet_id, req.body.value, stage);
         }
         else {
-            util.submitTrainingData(req.user.id, {tweetId: req.params.tweet_id, value: req.body.value}, userCondition.stage);
+            util.submitTrainingData(req.user.id, req.params.tweet_id, req.body.value, userCondition.stage);
         }
         
         returnedLabel = newTweetLabel;

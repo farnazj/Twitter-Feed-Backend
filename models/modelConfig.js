@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     const ModelConfig = sequelize.define('ModelConfig', {
         iteration: {
             type: DataTypes.INTEGER,
-            defaultValue: 0
+            defaultValue: -1
         },
         workspace: {
             type: DataTypes.STRING

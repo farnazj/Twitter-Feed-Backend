@@ -11,10 +11,10 @@ var config    = require(__dirname + '/../config/database.json')[env];
 var db        = {};
 var logger    = require("../lib/logger")
 
-// if (env == 'development')
+if (env == 'development')
   config.logging = (msg) => logger.info(msg);
-// else
-//   config.logging = false;
+else
+  config.logging = false;
 
 
 if (config.use_env_variable) {
@@ -43,5 +43,8 @@ Object.keys(db).forEach(modelName => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
+db.sequelize.options.logging = false;
+
 
 module.exports = db;
