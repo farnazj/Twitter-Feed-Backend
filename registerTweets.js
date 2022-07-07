@@ -1,8 +1,9 @@
 var db = require('./models');
+var util = require('./lib/util')
 var fs = require("fs");
 var path = require('path');
 var feed = JSON.parse(fs.readFileSync(path.join(__dirname, "data/jsons/farnaz_gathered_dataset.json")));
-
+util.shuffleArray(feed);
 
 module.exports = async function() {
 
