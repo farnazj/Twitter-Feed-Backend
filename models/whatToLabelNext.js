@@ -17,5 +17,9 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'utf8mb4',
     });
 
+    WhatToLabelNext.associate = function (models) {
+        models.WhatToLabelNext.belongsTo(models.User);
+    };
+
     return WhatToLabelNext;
   };

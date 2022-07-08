@@ -56,6 +56,7 @@ module.exports = async function() {
                     if (el.type !== null) {
                         // console.log('dakhele in ', res)
                         tweetSource = res[0][0];
+                        console.log('tweet source is', res[0][0])
                         let media = res[1]
                         proms.push(tweet.addTweetMedia(media));
                     }

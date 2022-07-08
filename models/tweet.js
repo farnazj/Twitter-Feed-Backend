@@ -8,9 +8,6 @@ module.exports = (sequelize, DataTypes) => {
         index: {
             type: DataTypes.INTEGER
         },
-        elementId: {
-            type: DataTypes.STRING //element id defined by the sleuth backend
-        },
         postTime: {
             type: DataTypes.DATE
         },
