@@ -9,8 +9,6 @@ var db  = require('../models');
 const logger = require('../lib/logger');
 var util = require('../lib/util');
 var routeHelpers = require('../lib/routeHelpers');
-// const { use } = require('passport');
-
 
 
 router.route('/accuracy-label/:tweet_id')
@@ -101,6 +99,8 @@ router.route('/accuracy-label/:tweet_id')
     
         let associationProms = [user.addUserAccuracyLabels(newTweetLabel), newTweetLabel.setUser(user), tweet.addTweetAccuracyLabels(newTweetLabel)];
         await Promise.all(associationProms);
+
+        logger.info(`in label accuracy route, ${JSON.stringify(req.body)}, user condition is : ${JSON.stringify(userCondition)}`)
 
         console.log('user stage is', userCondition.stage)
        
