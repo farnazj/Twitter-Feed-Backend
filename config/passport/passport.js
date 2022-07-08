@@ -8,28 +8,28 @@ module.exports = function(passport) {
     var User = models.User;
     passport.use('local-signup', new LocalStrategy({
       passReqToCallback: true,
-      usernameField: 'email', 
+      usernameField: 'workerId', 
       passwordField: 'password'
       },
 
-        function(req, username, password, done) {
+        function(req, workerId, password, done) {
 
           User.findOne({
             where: {
-              email: username
+              workerId: workerId
             }
           }).then(function(user) {
 
               if (user)
               {
                 return done(null, false, {
-                  message: 'That email is already taken'
+                  message: 'That worker ID has already been used'
                 });
               }
               else {
                   routeHelpers.generateHash(password).then((userPassword) => {
                       
-                    User.create({ passwordHash: userPassword, email: username })
+                    User.create({ passwordHash: userPassword, workerId: workerId })
                     .then((newUser, created) => {
                       if (!newUser) {
                           return done(null, false, { message: 'Sth went wrong' });
@@ -73,16 +73,16 @@ module.exports = function(passport) {
 
   passport.use('local-login', new LocalStrategy({
         passReqToCallback : true,
-        usernameField: 'email',    // define the parameter in req.body that passport can use as username and password
+        usernameField: 'workerId',    // define the parameter in req.body that passport can use as username and password
         passwordField: 'password'
     },
-    function(req, username, password, done) {
-        User.findOne({where: { email: username }}).then(function(user) {
+    function(req, workerId, password, done) {
+        User.findOne({ where: { workerId: workerId }}).then(function(user) {
 
           // if no user is found, return the message
           // console.log('user is found?', user)
           if (!user)
-              return done(null, false, { message: 'No user found with the given email' });
+              return done(null, false, { message: 'No user found with the given worker ID' });
           if (!user.isVerified)
               return done(null, false, { message: 'user not activated' });
 

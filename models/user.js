@@ -6,11 +6,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
       },
-      email: {
-        type: DataTypes.STRING,
-        validate: {
-          isEmail: true 
-        }
+      workerId: {
+        type: DataTypes.STRING
       },
       isVerified: {
         type: DataTypes.BOOLEAN,
