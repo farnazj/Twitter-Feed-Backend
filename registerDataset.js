@@ -10,10 +10,10 @@ module.exports = async function() {
     try {
 
         /////to be commented out for production
-        let allWorkspaces = (await sleuthServices.getWorkspaces()).data.workspaces;
-        console.log('all workspaces', allWorkspaces)
-        let workspaceProms = allWorkspaces.map(el => sleuthServices.deleteWorkspace(el));
-        await Promise.all(workspaceProms);
+        // let allWorkspaces = (await sleuthServices.getWorkspaces()).data.workspaces;
+        // console.log('all workspaces', allWorkspaces)
+        // let workspaceProms = allWorkspaces.map(el => sleuthServices.deleteWorkspace(el));
+        // await Promise.all(workspaceProms);
         /////
 
         let resp = await sleuthServices.getDatasets();

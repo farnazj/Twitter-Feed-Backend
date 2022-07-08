@@ -47,23 +47,17 @@ module.exports = async function() {
 
                 Promise.all(allProms)
                 .then((res) => {
-
-                    // console.log('result is', res)
-                    // console.log('tweet is ', tweet)
                     let tweetSource;
                     let proms = [];
 
+                    tweetSource = res[0][0];
+                    proms.push(tweet.setTweetSource(tweetSource));
+
                     if (el.type !== null) {
-                        // console.log('dakhele in ', res)
-                        tweetSource = res[0][0];
-                        console.log('tweet source is', res[0][0])
                         let media = res[1]
                         proms.push(tweet.addTweetMedia(media));
                     }
-                    else
-                        tweetSource = res[0][0];
-
-                    proms.push(tweet.setTweetSource(tweetSource));
+                
                     return Promise.all(proms);
                 })
             }

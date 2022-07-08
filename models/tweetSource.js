@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'utf8mb4',
     });
  
+    TweetSource.associate = function (models) {
+        models.TweetSource.belongsToMany(models.Tweet, { through: 'TweetsofSource' });
+    }
 
     return TweetSource;
   };
