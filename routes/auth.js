@@ -103,7 +103,7 @@ router.route('/signup')
 
       let condition = await db.Condition.create({
         stage: 0,
-        experiment: 'test'       //TODO: put user in an experiment condition and save it on the user instance
+        experiment: 'test2'       //TODO: put user in an experiment condition 
       })
 
       proms.push(user.addUserCondition(condition));
