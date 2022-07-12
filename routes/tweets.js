@@ -24,10 +24,6 @@ router.route('/tweets')
     let tweetStageMapping = JSON.parse((await user.getTweetStage()).mappingsBlob);
     let tweetsForStage = Object.entries(tweetStageMapping).filter(([tweetId, stage]) => stage == mostRecentCondtion.stage).map(el => parseInt(el[0]));
 
-    console.log(tweetStageMapping)
-    console.log('***')
-    console.log(tweetsForStage)
-
     let tweets;
 
     let whereConfig = {};
@@ -85,8 +81,6 @@ router.route('/tweets')
         });    
 
     }
-
-    // console.log('returned tweets', tweets)
 
     res.send(tweets);
 }));

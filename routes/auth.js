@@ -41,7 +41,6 @@ router.route('/login')
           }]
       })
       .then(expandedUser => {
-        // console.log('expnaded user', expandedUser)
         return res.send({'user': expandedUser});
       })
 
@@ -115,8 +114,6 @@ router.route('/signup')
       await Promise.all(proms);
 
       let allJobs = await predictionsQueue.getJobs()
-      console.log('adding to prediction queue?', allJobs)
-
       res.status(200).send({ message: `Thanks for signing up! Your account is all set.` })
       
     }

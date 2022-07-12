@@ -9,7 +9,7 @@ var db  = require('../models');
 const logger = require('../lib/logger');
 var util = require('../lib/util');
 var routeHelpers = require('../lib/routeHelpers');
-
+var moment = require('moment');
 
 router.route('/accuracy-label/:tweet_id')
 .get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
@@ -31,7 +31,6 @@ router.route('/accuracy-label/:tweet_id')
 
 .post(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
 
-    console.log('req body', req.body)
     let user = await db.User.findByPk(req.user.id);
     let userCondition = (await user.getUserConditions({
         where: {
@@ -57,8 +56,10 @@ router.route('/accuracy-label/:tweet_id')
     let returnedLabel;
 
     if (req.body.reason || req.body.confidence) {
-        console.log('existing labels', existingAccuracyLabels)
 
+        // let labelCreationDates = existingAccuracyLabels.map(label => moment(label.createdAt));
+        // let maxDate = moment.max(labelCreationDates);
+        // let mostRecentLabel = existingAccuracyLabels.find(label => moment(label.createdAt) == maxDate)[0];
         let mostRecentLabel = existingAccuracyLabels.filter(label => label.version == 1)[0];
 
         if (req.body.reason)
@@ -73,14 +74,7 @@ router.route('/accuracy-label/:tweet_id')
 
         let mostRecentLabelByUser = existingAccuracyLabels.find(label => label.version == 1 && label.assessor == 0);
 
-        let tweetPrevLabelsProms = existingAccuracyLabels.map(label => {
-            label.version = label.version - 1;
-            return label.save();
-        })
-    
-        await Promise.all(tweetPrevLabelsProms);
-        
-        let extraData =  {};
+        let extraData = {};
         if (mostRecentLabelByUser) {
             extraData.confidence = mostRecentLabelByUser.confidence;
             extraData.reason = mostRecentLabelByUser.reason;
@@ -100,9 +94,15 @@ router.route('/accuracy-label/:tweet_id')
         let associationProms = [user.addUserAccuracyLabels(newTweetLabel), newTweetLabel.setUser(user), tweet.addTweetAccuracyLabels(newTweetLabel)];
         await Promise.all(associationProms);
 
-        logger.info(`in label accuracy route, ${JSON.stringify(req.body)}, user condition is : ${JSON.stringify(userCondition)}`)
+        let tweetPrevLabelsProms = existingAccuracyLabels.map(label => {
+            label.version = label.version - 1;
+            return label.save();
+        })
+    
+        await Promise.all(tweetPrevLabelsProms);
+ 
 
-        console.log('user stage is', userCondition.stage)
+        logger.info(`in label accuracy route, ${JSON.stringify(req.body)}, user condition is : ${JSON.stringify(userCondition)}`)
        
         if (userCondition.stage == 0) {
             for (let stage of [1, 2])

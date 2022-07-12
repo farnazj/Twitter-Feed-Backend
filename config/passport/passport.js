@@ -79,8 +79,6 @@ module.exports = function(passport) {
     function(req, workerId, password, done) {
         User.findOne({ where: { workerId: workerId }}).then(function(user) {
 
-          // if no user is found, return the message
-          // console.log('user is found?', user)
           if (!user)
               return done(null, false, { message: 'No user found with the given worker ID' });
           if (!user.isVerified)
@@ -94,7 +92,6 @@ module.exports = function(passport) {
              if (!isValid) {
                return done(null, false, {message: 'Password not valid'});
              }
-             console.log('logging in the user')
              return done(null, user);
            })
 

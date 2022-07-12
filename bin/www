@@ -52,11 +52,6 @@ wss.on('connection', async function connection(ws, req) {
       throw { type: 'unauthorized', message: 'User is not logged in' };
 
       let user = await db.User.findByPk(req.session.passport.user);
-      // let userCondition = (await user.getUserConditions({
-      //   where: {
-      //     version: 1
-      //   }
-      // }))[0];
 
       if (!user)
         throw { type: 'unauthorized', message: 'Something is wrong' };
@@ -75,14 +70,9 @@ wss.on('connection', async function connection(ws, req) {
       
       if (modelConfigs.length) {
 
-        console.log('user already has configs')
-
         let allRepeatableJobs = await predictionsQueue.getRepeatableJobs();
-        console.log('all repeatable jobs', allRepeatableJobs)
         let userJobIds = allRepeatableJobs.filter(job => [`stage1-modelcheck-user${user.id}`, `stage2-modelcheck-user${user.id}`].includes(job.id) ).map(el =>
           el.id);
-
-        console.log('user che jobhaE dare', userJobIds)
 
           for (let stageIndex = 0 ; stageIndex < 2 ; stageIndex++) {
 
