@@ -101,10 +101,11 @@ router.route('/signup')
       proms.push(user.setTweetStage(tweetStage));
 
       let experiments = ['exp1', 'exp2']; 
+      let randomIndex = util.getRandomInt(0, 1);
 
       let condition = await db.Condition.create({
         stage: 0,
-        experiment: experiments[util.getRandomInt(0, 2)]
+        experiment: experiments[randomIndex]
       })
 
       proms.push(user.addUserCondition(condition));

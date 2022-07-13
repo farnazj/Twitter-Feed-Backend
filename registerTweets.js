@@ -51,7 +51,7 @@ module.exports = async function() {
                     let proms = [];
 
                     tweetSource = res[0][0];
-                    proms.push(tweet.setTweetSource(tweetSource));
+                    proms.push(...[tweet.setTweetSource(tweetSource), tweetSource.addTweet(tweet)]);
 
                     if (el.type !== null) {
                         let media = res[1]
