@@ -1,20 +1,20 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-    const ReceiptLog = sequelize.define('ReceiptLog', {
+    const FeedDeliveryLog = sequelize.define('FeedDeliveryLog', {
         userId: {
             type: DataTypes.INTEGER
         },
-        timeReceived: {
-            type: DataTypes.DATE
-        },
-        timeDisplayed: {
-            type: DataTypes.DATE
-        },
-        modelIteration: {
+        stage: {
             type: DataTypes.INTEGER
         },
-        changedTweets: {
+        limit: {
+            type: DataTypes.INTEGER
+        },
+        offset: {
+            type: DataTypes.INTEGER
+        },
+        tweetIds: {
             type: DataTypes.TEXT('long')
         }
         
@@ -22,9 +22,9 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'utf8mb4',
     });
 
-    return ReceiptLog;
+    return FeedDeliveryLog;
   }
 
   /*
-  Receipt of model prediction changes in stage 2 sent by the client
+  log of the ordr of tweets sent to participants in each stage
   */

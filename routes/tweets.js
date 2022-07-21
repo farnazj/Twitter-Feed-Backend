@@ -67,8 +67,7 @@ router.route('/tweets')
                     UserId: {
                         [Op.eq]: req.user.id
                     },
-                    version: 1,
-                    // condition: mostRecentCondtion.stage
+                    version: 1
                 }
             }, {
                 model: db.TweetSource
@@ -81,6 +80,14 @@ router.route('/tweets')
         });    
 
     }
+
+    db.FeedDeliveryLog.create({
+        userId: req.user.id,
+        stage: mostRecentCondtion.stage,
+        limit: paginationReq.limit,
+        offset: paginationReq.offset,
+        tweetIds: JSON.stringify(tweets.map(tweet => tweet.id))
+    })
     
     res.send(tweets);
 }));

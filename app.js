@@ -92,7 +92,7 @@ function morganFormat(tokens, req, res) {
     tokens['response-time'](req, res), 'ms',
     tokens.date(req, res, 'iso'),
     'req-headers-' + tokens['req-headers'](req),
-    'req-body-' + tokens['req-body'](req),
+    'req-body-' + tokens['req-body'](req)
     // 'response-' + tokens['res-body'](req, res)
   ].join(' ')
 };

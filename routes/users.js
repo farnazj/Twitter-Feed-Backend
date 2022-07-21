@@ -38,6 +38,13 @@ router.route('/users/:id/update-condition')
     let conditions = await user.getUserConditions();
 
     let newCondition = await util.advanceStage(conditions, user);
+
+    if (newCondition.stage == 2) {
+        let allRepeatableJobs = await predictionsQueue.getRepeatableJobs();
+        let stage1UserJobkey = allRepeatableJobs.filter(job => job.id == `stage1-modelcheck-user${user.id}` )[0].key;
+        await predictionsQueue.removeRepeatableByKey(stage1UserJobkey);
+    }
+
     res.send({ message: 'condition update is complete', condition: newCondition });
 }));
 

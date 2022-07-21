@@ -3,24 +3,25 @@ var fs = require("fs");
 var sleuthServices = require('./lib/sleuthServices');
 var path = require('path');
 var FormData = require('form-data');
-var feed = fs.createReadStream(path.join(__dirname, "data/csv/sleuth_farnaz_gathered_dataset.csv"));
+var feed = fs.createReadStream(path.join(__dirname, "data/csv/sleuth_sampled_data.csv"));
 var constants = require('./lib/constants');
 
 module.exports = async function() {
     try {
 
-        /////to be commented out for production
-        // let allWorkspaces = (await sleuthServices.getWorkspaces()).data.workspaces;
-        // console.log('all workspaces', allWorkspaces)
-        // let workspaceProms = allWorkspaces.map(el => sleuthServices.deleteWorkspace(el));
-        // await Promise.all(workspaceProms);
-        /////
+        // /to be commented out for production
+        let allWorkspaces = (await sleuthServices.getWorkspaces()).data.workspaces;
+        console.log('all workspaces', allWorkspaces)
+        let workspaceProms = allWorkspaces.map(el => sleuthServices.deleteWorkspace(el));
+        await Promise.all(workspaceProms);
+        
 
         let resp = await sleuthServices.getDatasets();
         datasets = resp.data.datasets;
     
         let twitterFeedDataset = datasets.filter(el => el.dataset_id == constants.SLEUTH_DOC_NAME);
-        if (!twitterFeedDataset.length) {
+        // if (!twitterFeedDataset.length) {
+            //TODO: uncomment above line
 
             let formData = new FormData()
             formData.append('file', feed);
@@ -31,7 +32,7 @@ module.exports = async function() {
                 data: formData
             })
     
-        }
+        // }
     }
     catch(err) {
         console.error(err);
