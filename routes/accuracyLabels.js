@@ -9,7 +9,6 @@ var db  = require('../models');
 const logger = require('../lib/logger');
 var util = require('../lib/util');
 var routeHelpers = require('../lib/routeHelpers');
-var moment = require('moment');
 
 router.route('/accuracy-label/:tweet_id')
 .get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
@@ -101,7 +100,6 @@ router.route('/accuracy-label/:tweet_id')
     
         await Promise.all(tweetPrevLabelsProms);
  
-
         logger.info(`in label accuracy route, ${JSON.stringify(req.body)}, user condition is : ${JSON.stringify(userCondition)}`)
        
         if (userCondition.stage == 0) {
@@ -114,7 +112,6 @@ router.route('/accuracy-label/:tweet_id')
         
         returnedLabel = newTweetLabel;
     }
-
 
     res.send({ message: 'updated', data: returnedLabel });
 

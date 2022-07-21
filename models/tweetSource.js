@@ -9,10 +9,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         imageUrl: {
-            type: DataTypes.STRING,
-            validate: {
-                isUrl: true 
-            }
+            type: DataTypes.STRING
         },
         verified: {
            type: DataTypes.BOOLEAN

@@ -27,7 +27,9 @@ var app = express();
 
 
 app.use(cors({credentials: true, origin: true}));
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
 
 
 //a rotating write stream

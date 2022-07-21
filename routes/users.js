@@ -38,7 +38,6 @@ router.route('/users/:id/update-condition')
     let conditions = await user.getUserConditions();
 
     let newCondition = await util.advanceStage(conditions, user);
-    
     res.send({ message: 'condition update is complete', condition: newCondition });
 }));
 

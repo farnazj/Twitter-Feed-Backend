@@ -2,7 +2,7 @@ var db = require('./models');
 var util = require('./lib/util')
 var fs = require("fs");
 var path = require('path');
-var feed = JSON.parse(fs.readFileSync(path.join(__dirname, "data/jsons/farnaz_gathered_dataset.json")));
+var feed = JSON.parse(fs.readFileSync(path.join(__dirname, "data/jsons/sampled_data.json")));
 util.shuffleArray(feed);
 
 module.exports = async function() {
@@ -17,8 +17,8 @@ module.exports = async function() {
             defaults: {
                 postTime: el.created_at,
                 text: el.text,
-                retweetCount: el.retweet_count,
-                likeCount: el.like_count,
+                // retweetCount: el.retweet_count,
+                // likeCount: el.like_count,
                 preTask: el.pre_task,
                 index: el.index
             }
@@ -36,14 +36,14 @@ module.exports = async function() {
                     }
                 })];
 
-                if (el.type !== null) {
-                    allProms.push(db.Media.create({
-                        url: el.url,
-                        type: el.type,
-                        width: el.width,
-                        height: el.height
-                    }))
-                }
+                // if (el.type !== null) {
+                //     allProms.push(db.Media.create({
+                //         url: el.url,
+                //         type: el.type,
+                //         width: el.width,
+                //         height: el.height
+                //     }))
+                // }
 
                 Promise.all(allProms)
                 .then((res) => {
