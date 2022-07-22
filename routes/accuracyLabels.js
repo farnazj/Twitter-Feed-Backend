@@ -56,9 +56,6 @@ router.route('/accuracy-label/:tweet_id')
 
     if (req.body.reason || req.body.confidence) {
 
-        // let labelCreationDates = existingAccuracyLabels.map(label => moment(label.createdAt));
-        // let maxDate = moment.max(labelCreationDates);
-        // let mostRecentLabel = existingAccuracyLabels.find(label => moment(label.createdAt) == maxDate)[0];
         let mostRecentLabel = existingAccuracyLabels.filter(label => label.version == 1)[0];
 
         if (req.body.reason)
@@ -78,6 +75,24 @@ router.route('/accuracy-label/:tweet_id')
             extraData.confidence = mostRecentLabelByUser.confidence;
             extraData.reason = mostRecentLabelByUser.reason;
         }
+
+        /*
+        To record what iteration the model had had when the accuracy label was posted by the user.
+        Can help determine if the model would have had a similar accuracy prediction had the user
+        given it enough time to be updated in case the model had had enough datapoints for training
+        the next iteration but just not enough time to do so before the user updated the accuracy
+        assessment of a tweet.
+        */
+        let ConfigforStage = userCondition.stage == 0 ? 1 : userCondition.stage;
+            
+            let modelConfig = (await user.getUserModelConfigs({
+                where: {
+                    forStage: ConfigforStage
+                }
+            }))[0];
+
+        let changedLastInIteration = modelConfig.iteration;
+        
         
         let newTweetLabel = await db.AccuracyLabel.create({
             assessor: 0,
@@ -85,6 +100,7 @@ router.route('/accuracy-label/:tweet_id')
             version: 1,
             stage: userCondition.stage,
             timeSinceFeedLoaded: req.body.timeSinceFeedLoaded,
+            changedLastInIteration: changedLastInIteration,
             ...extraData
         });
         
@@ -100,7 +116,7 @@ router.route('/accuracy-label/:tweet_id')
     
         await Promise.all(tweetPrevLabelsProms);
  
-        logger.info(`in label accuracy route, ${JSON.stringify(req.body)}, user condition is : ${JSON.stringify(userCondition)}`)
+        // logger.info(`in label accuracy route, ${JSON.stringify(req.body)}, user condition is : ${JSON.stringify(userCondition)}`)
        
         if (userCondition.stage == 0) {
             for (let stage of [1, 2])

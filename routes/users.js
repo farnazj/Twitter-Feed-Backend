@@ -49,6 +49,36 @@ router.route('/users/:id/update-condition')
 }));
 
 
+router.route('/users/mturk-code')
+.get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
+
+    let code = await db.MTurkCode.findOne({
+        where: {
+            UserId: req.user.id
+        }
+    });
+
+    if (code) {
+        res.send(code);
+    }
+    else {
+        let results = await Promise.all([
+            db.User.findByPk(req.user.id),
+            db.MTurkCode.create({
+                code: util.makeRandomId(6)
+            })
+        ]) ;
+
+        let user = results[0];
+        let code = results[1];
+
+        await code.setUser(user);
+
+        res.send(code);
+    }
+
+}));
+
 
 router.route('/users/:id/end-study')
 .post(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
