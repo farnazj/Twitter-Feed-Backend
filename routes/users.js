@@ -9,26 +9,7 @@ var db  = require('../models');
 const logger = require('../lib/logger');
 var routeHelpers = require('../lib/routeHelpers');
 var util = require('../lib/util');
-
-
-router.route('/users/:id')
-.get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
-
-    let user = await db.User.findOne({
-        where: {
-            id: req.params.id
-        },
-        include: [{
-            model: db.Condition,
-            as: 'UserConditions',
-            where: {
-                version: 1
-            }
-        }]
-    });
-
-    res.send(user);
-}));
+var sleuthServices = require('../lib/sleuthServices');
 
 
 router.route('/users/:id/update-condition')
@@ -40,9 +21,18 @@ router.route('/users/:id/update-condition')
     let newCondition = await util.advanceStage(conditions, user);
 
     if (newCondition.stage == 2) {
+        let modelConfigsProm = user.getUserModelConfigs({
+            where: {
+                forStage: 1
+            }
+        });
+
         let allRepeatableJobs = await predictionsQueue.getRepeatableJobs();
         let stage1UserJobkey = allRepeatableJobs.filter(job => job.id == `stage1-modelcheck-user${user.id}` )[0].key;
         await predictionsQueue.removeRepeatableByKey(stage1UserJobkey);
+    
+        let modelConfig = (await modelConfigsProm)[0];
+        await sleuthServices.deleteWorkspace(modelConfig.workspace);
     }
 
     res.send({ message: 'condition update is complete', condition: newCondition });
@@ -83,6 +73,11 @@ router.route('/users/mturk-code')
 router.route('/users/:id/end-study')
 .post(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
     let user = await db.User.findByPk(req.params.id);
+    let modelConfigsProm = user.getUserModelConfigs({
+        where: {
+            forStage: 2
+        }
+    });
     let allRepeatableJobs = await predictionsQueue.getRepeatableJobs();
 
     let userJobkeys = allRepeatableJobs.filter(job => [`stage1-modelcheck-user${user.id}`, `stage2-modelcheck-user${user.id}`].includes(job.id) ).map(el =>
@@ -92,8 +87,32 @@ router.route('/users/:id/end-study')
         await predictionsQueue.removeRepeatableByKey(jobKey);
     }
 
+    let modelConfig = (await modelConfigsProm)[0];
+    await sleuthServices.deleteWorkspace(modelConfig.workspace);
+    
+
     res.send({ message: 'ended study' });
 
+}));
+
+
+router.route('/users/:id')
+.get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
+
+    let user = await db.User.findOne({
+        where: {
+            id: req.params.id
+        },
+        include: [{
+            model: db.Condition,
+            as: 'UserConditions',
+            where: {
+                version: 1
+            }
+        }]
+    });
+
+    res.send(user);
 }));
 
 module.exports = router;

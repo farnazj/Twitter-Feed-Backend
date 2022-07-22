@@ -20,8 +20,7 @@ module.exports = async function() {
         datasets = resp.data.datasets;
     
         let twitterFeedDataset = datasets.filter(el => el.dataset_id == constants.SLEUTH_DOC_NAME);
-        // if (!twitterFeedDataset.length) {
-            //TODO: uncomment above line
+        if (!twitterFeedDataset.length) {
 
             let formData = new FormData()
             formData.append('file', feed);
@@ -32,7 +31,7 @@ module.exports = async function() {
                 data: formData
             })
     
-        // }
+        }
     }
     catch(err) {
         console.error(err);
