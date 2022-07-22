@@ -55,7 +55,6 @@ router.route('/users/:id/end-study')
     let user = await db.User.findByPk(req.params.id);
     let allRepeatableJobs = await predictionsQueue.getRepeatableJobs();
 
-    console.log('all repeatable jobs', allRepeatableJobs)
     let userJobkeys = allRepeatableJobs.filter(job => [`stage1-modelcheck-user${user.id}`, `stage2-modelcheck-user${user.id}`].includes(job.id) ).map(el =>
       el.key);
 
