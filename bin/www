@@ -87,7 +87,7 @@ wss.on('connection', async function connection(ws, req) {
                       every: 10000
                   },
                   jobId: `stage${stageIndex + 1}-modelcheck-user${user.id}`,
-
+                  removeOnComplete: true
                 }
               )
             }
