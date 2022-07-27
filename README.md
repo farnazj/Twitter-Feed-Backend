@@ -44,10 +44,10 @@ The server uses dotenv to load environment variables from a .env file into proce
 This Node.js server stors sessions in a Redis store. In addition, Redis is used for mainaining a queue of repeatable jobs managed by [Bull](https://github.com/OptimalBits/bull). You should have [Redis](https://redis.io/download) installed and running on your machine before launching the server. Alternatively, you can connect to a remote Redis server and specify the hostname, the port, and optionally the password in the .env file.
 
 #### Add the Data Files
-For privacy reasons, the tweet data that the server needs is not committed in the repo. One is a .csv file that needs to be placed in ./data/csv and the other is a .json file that needs to be placed in ./data/jsons.
+For privacy reasons, the tweet data that the server needs is not committed in the repo. One is a .csv file that needs to be placed in `./data/csv` and the other is a .json file that needs to be placed in `./data/jsons`.
 The csv file will be sent as a document to Label Sleuth and the json file is for the Node.js server to read so it can insert its tweets and tweet sources into the database if they do not already exist.
 The csv file has 3 columns: doc_id (the tweet ID), text (the text of the tweet), and index. The json file will contain an array of objects. Each object has these fields: tweet_id, text, author_id, username, name, profile_image_url, verified (if the author of the tweet has the blue checkmark given by twitter), pre_task (boolean indicating whether the tweet is part of the feed of tweets presented to the user in the Seeding stage), index. The index of a tweet across the json and the csv files are the same. The index of a tweet will be used by the server to find its corresponding entity in Label Sleuth.
 
 #### Run Twitter-Feed-Backend Server
-cd to the root directory fo the project where pacakge.json is. Run:
+cd to the root directory fo the project where `package.json` is. Run:
 * `npm start`
