@@ -16,16 +16,16 @@ module.exports = (sequelize, DataTypes) => {
         },
         preTask: { //part of the set of tweets that users assess as the pre-task
             type: DataTypes.BOOLEAN
-        },
-        retweetCount: {
-            type: DataTypes.INTEGER
-        },
-        likeCount: {
-            type: DataTypes.INTEGER
-        },
-        annotationLabel: {
-            type: DataTypes.INTEGER //0 for accurate, 1 for inaccurate
         }
+        // retweetCount: {
+        //     type: DataTypes.INTEGER
+        // },
+        // likeCount: {
+        //     type: DataTypes.INTEGER
+        // },
+        // annotationLabel: {
+        //     type: DataTypes.INTEGER //0 for accurate, 1 for inaccurate
+        // }
         // no reply or quote count because we can't show them 
     }, {
         charset: 'utf8mb4',
