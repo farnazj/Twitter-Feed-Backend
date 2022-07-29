@@ -48,7 +48,10 @@ router.route('/accuracy-label/:tweet_id')
             TweetId: {
                 [Op.eq]: req.params.tweet_id
             },
-            stage: userCondition.stage
+            stage: userCondition.stage,
+            version: {
+                [Op.lte]: 1
+            }
         }
     });
 
