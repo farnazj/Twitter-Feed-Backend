@@ -28,7 +28,7 @@ router.route('/logs')
     });
 
     db.ReceiptLog.create({
-        UserId: req.user.id,
+        userId: req.user.id,
         modelIteration: userModelConfig.iteration,
         timeReceived: req.body.timeReceived,
         timeDisplayed: req.body.timeDisplayed,
