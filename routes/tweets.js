@@ -12,6 +12,36 @@ const user = require('../models/user');
 const { where } = require('sequelize');
 
 
+router.route('/tweets-count')
+.get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
+    let user = await db.User.findByPk(req.user.id);
+  
+    let userConditions = await user.getUserConditions();
+    let currentStage = userConditions.find(condition => condition.version == 1).stage;
+    let whereStatement;
+
+    if (currentStage == 0) {
+        whereStatement = {
+            preTask: 1
+        }
+    }
+    else {
+        let tweetStageMapping = JSON.parse((await user.getTweetStage()).mappingsBlob);
+        let tweetsForStage = Object.entries(tweetStageMapping).filter(([tweetId, stage]) => stage == currentStage).map(el => parseInt(el[0]));
+        whereStatement = {
+            id: {
+                [Op.in]: tweetsForStage
+            }
+        }
+    }
+
+    let count = (await db.Tweet.findAll({
+        where: whereStatement
+    })).length;
+    
+    res.send({data: count});
+}));
+
 router.route('/tweets')
 .get(routeHelpers.isLoggedIn, wrapAsync(async function(req, res) {
     let paginationReq = routeHelpers.getLimitOffset(req);
