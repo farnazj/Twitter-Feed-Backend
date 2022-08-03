@@ -57,14 +57,14 @@ router.route('/accuracy-label/:tweet_id')
 
     let returnedLabel;
 
-    if (req.body.reason || req.body.confidence) {
+    if ('reason' in req.body || 'confidence' in req.body) {
 
         let mostRecentLabel = existingAccuracyLabels.filter(label => label.version == 1)[0];
 
         let updates = {};
-        if (req.body.reason)
+        if ('reason' in req.body)
             updates.reason = req.body.reason;
-        if (req.body.confidence)
+        if ('confidence' in req.body)
             updates.confidence = req.body.confidence;
         
         mostRecentLabel.update(updates);
