@@ -112,7 +112,7 @@ app.use(morgan(morganFormat, {
 
 app.use(express.json({limit: '750kb'}));
 app.use(express.urlencoded({ extended: true, limit: '750kb'}));
-//app.use(cookieParser());
+app.use(cookieParser(process.env.SESSION_KEY));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(compression()); //Compress all routes
 
@@ -155,6 +155,10 @@ app.use(function handleAssertionError(error, req, res, next) {
   next(error);
 });
 
+//for getting the stack trace of unhandled promise rejections
+// process.on('unhandledRejection', (reason, promise) => {
+//   console.log('unhandledRejection what is going on', reason, promise);
+// });
 
 // error handler
 app.use(function(err, req, res, next) {
